@@ -1,12 +1,20 @@
-const express = require('express')
-const app = express()
-
+const express = require('express');
 const path = require('path');
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.get('/', (req, res) => {
-    res.status(200).sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.listen(3000,()=>{
-    console.log('server running on the port 3000....');
-})
+function greet(name) {
+  return `Hello, ${name}`;
+}
+
+console.log("Node Git Demo Started");
+console.log(greet("Keerthivasan"));
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
