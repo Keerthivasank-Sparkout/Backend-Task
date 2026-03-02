@@ -7,13 +7,13 @@ const PORT = process.env.PORT || 3000;
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+console.log("Server is running...");
 
 function greet(name) {
-  return `Hello, ${name}`;
+  return `Hi, ${name}`;
 }
 
-console.log("Node Git Demo Started");
-console.log(greet("Keerthivasan"));
+console.log(greet("User"));
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
