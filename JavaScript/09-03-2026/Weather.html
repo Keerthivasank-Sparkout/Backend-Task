@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #1e1e2f;
+            color: white;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .container {
+            background: #2b2b40;
+            width: 350px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        input {
+            padding: 10px;
+            width: 70%;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #loading {
+            color: yellow;
+            margin-top: 15px;
+        }
+
+        #error {
+            color: red;
+            margin-top: 15px;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Weather Application</h2>
+
+        <input type="text" id="cityInput" placeholder="Enter city name">
+        <button onclick="getWeather()">Search</button>
+
+        <div id="loading" class="hidden">Loading weather...</div>
+        <div id="error" class="hidden"></div>
+
+        <div class="result">
+            <h3 id="city"></h3>
+            <p id="temp"></p>
+            <p id="condition"></p>
+            <p id="humidity"></p>
+        </div>
+
+    </div>
+    <script src="config.js"></script>
+    <script>
+        const openWeatherKey = CONFIG.OPEN_WEATHER_KEY;
+        const weatherApiKey = CONFIG.WEATHER_API_KEY;
+
+        async function getWeather() {
+
+            const city = document.getElementById("cityInput").value;
+
+            const loading = document.getElementById("loading");
+            const errorDiv = document.getElementById("error");
+
+            if (!city) {
+                showError("Please enter a city name");
+                return;
+            }
+
+            loading.classList.remove("hidden");
+            errorDiv.classList.add("hidden");
+
+            try {
+
+                const openWeatherPromise = fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${openWeatherKey}&units=metric`
+                );
+
+                const weatherApiPromise = fetch(
+                    `https://api.weatherapi.com/v1/current.json?key=${weatherApiKey}&q=${city}`
+                );
+
+                const [res1, res2] = await Promise.all([
+                    openWeatherPromise,
+                    weatherApiPromise
+                ]);
+
+                if (!res1.ok || !res2.ok) {
+                    throw new Error("Unable to fetch weather data");
+                }
+
+                const data1 = await res1.json();
+                const data2 = await res2.json();
+
+                displayWeather(data1, data2);
+
+            }
+            catch (error) {
+                showError(error.message);
+            }
+            finally {
+                loading.classList.add("hidden");
+            }
+
+        }
+
+        function displayWeather(api1, api2) {
+
+            document.getElementById("city").textContent =
+                "City: " + api1.name;
+
+            document.getElementById("temp").textContent =
+                "Temperature: " + api1.main.temp + " °C";
+
+            document.getElementById("condition").textContent =
+                "Condition: " + api2.current.condition.text;
+
+            document.getElementById("humidity").textContent =
+                "Humidity: " + api1.main.humidity + "%";
+
+        }
+
+        function showError(msg) {
+
+            const errorDiv = document.getElementById("error");
+            errorDiv.textContent = msg;
+            errorDiv.classList.remove("hidden");
+
+        }
+
+    </script>
+
+</body>
+
+</html>
