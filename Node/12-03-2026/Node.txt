@@ -1,0 +1,3 @@
+What is node js?
+    Node js is a free and open-source , cross-platform javascript run time environment that allows developer to run Javascript code outside a web browser.
+    Built on Chrome's V8 JavaScript engine, Node.js enables server-side development, command-line tools, and scripting, making it possible to use JavaScript for both client- and server-side programming. 
