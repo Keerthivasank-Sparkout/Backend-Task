@@ -13,8 +13,14 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "index.js",
+  "main": "Node/16-03-2026/index.js",
   "scripts": {
+    "dev": "NODE_ENV=development nodemon Node/16-03-2026/index.js",
+    "start": "NODE_ENV=production node Node/16-03-2026/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "nodemon": "^3.1.14"
   }
 }
