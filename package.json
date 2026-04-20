@@ -16,7 +16,7 @@
   "main": "Node/16-04-2026//Tour/app.js",
   "scripts": {
     "dev": "NODE_ENV=development nodemon Node/16-03-2026/index.js",
-    "start": "nodemon Node/16-04-2026/Tour/app.js",
+    "start": "nodemon Node/20-04-2026/Tour/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
