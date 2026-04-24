@@ -1,0 +1,63 @@
+Socket.IO Server Setup and WebSocket vs Socket.IO
+
+1. Installing and Setting Up Socket.IO Server
+
+Step 1:
+Open terminal inside the Socket folder.
+
+Step 2:
+Run the below command to create package.json.
+npm init -y
+
+Step 3:
+Install required packages.
+npm install express socket.io
+
+Step 4:
+Create index.js and add the server code.
+
+What this server does:
+- Creates an Express application
+- Creates an HTTP server
+- Attaches Socket.IO to the HTTP server
+- Listens for client connection
+- Sends a welcome event
+- Receives chat messages
+- Broadcasts chat messages to all connected clients
+
+Run the server:
+npm start
+
+Output:
+Server is listening on http://localhost:3000
+
+Important events used:
+- connection: runs when a client connects
+- welcome: custom event sent from server to client
+- chat-message: custom event for sending messages
+- disconnect: runs when a client leaves
+
+2. WebSocket vs Socket.IO Differences
+
+WebSocket:
+- It is a communication protocol
+- It provides full-duplex communication between client and server
+- It is lightweight and fast
+- You need to handle reconnection manually
+- You need to build your own event structure and fallback logic
+
+Socket.IO:
+- It is a library built on top of real-time communication techniques
+- It gives event-based communication
+- It supports auto reconnection
+- It provides rooms and namespaces
+- It can send and receive data easily using custom events
+- It is easier for beginners
+
+Simple difference:
+- Use WebSocket when you want low-level control and very small overhead
+- Use Socket.IO when you want quick setup, built-in features, and easy real-time messaging
+
+Conclusion:
+Socket.IO is easier to use for chat apps, notifications, live updates, and collaborative apps.
+WebSocket is better when you want direct protocol-level control.

@@ -1,0 +1,18 @@
+{
+  "name": "socket",
+  "version": "1.0.0",
+  "description": "Simple Socket.IO server setup example",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --check index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
+  }
+}
