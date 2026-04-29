@@ -1,0 +1,241 @@
+.app-shell {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background:
+    linear-gradient(135deg, rgba(33, 150, 136, 0.12), transparent 34%),
+    linear-gradient(315deg, rgba(246, 117, 65, 0.12), transparent 32%),
+    #f7f8fb;
+}
+
+.chat-panel {
+  width: min(920px, 100%);
+  height: min(760px, calc(100svh - 48px));
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  overflow: hidden;
+  border: 1px solid #d9dee8;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(28, 34, 48, 0.14);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e6e9ef;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #657184;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.chat-header h1 {
+  margin: 0;
+  color: #101828;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 124px;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  color: #667085;
+  font-size: 14px;
+  font-weight: 700;
+  background: #f8fafc;
+}
+
+.status span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #ef4444;
+}
+
+.status.online {
+  color: #087443;
+  background: #ecfdf3;
+  border-color: #abefc6;
+}
+
+.status.online span {
+  background: #17b26a;
+}
+
+.connection-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 24px;
+  border-bottom: 1px solid #e6e9ef;
+  color: #475467;
+  font-size: 14px;
+  background: #fbfcfe;
+}
+
+.connection-info span {
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #eef2f6;
+}
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 24px;
+  overflow-y: auto;
+  background: #f8fafc;
+}
+
+.empty-state,
+.notice {
+  align-self: center;
+  margin: auto 0;
+  color: #667085;
+  font-size: 15px;
+  text-align: center;
+}
+
+.notice {
+  margin: 4px 0;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #eef2f6;
+}
+
+.notice span {
+  color: #98a2b3;
+}
+
+.message {
+  width: min(72%, 560px);
+  padding: 12px 14px;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1d2939;
+  text-align: left;
+}
+
+.message.mine {
+  align-self: flex-end;
+  color: #052e2b;
+  border-color: #a7ddd5;
+  background: #dff7f2;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.message-meta strong {
+  color: #344054;
+}
+
+.message p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: minmax(110px, 180px) 1fr auto;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid #e6e9ef;
+  background: #ffffff;
+}
+
+.composer input {
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  color: #101828;
+  font: inherit;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.composer input:focus {
+  border-color: #178c80;
+  outline: 3px solid rgba(23, 140, 128, 0.16);
+}
+
+.composer button {
+  height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 800;
+  background: #178c80;
+  cursor: pointer;
+}
+
+.composer button:disabled {
+  background: #98a2b3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .app-shell {
+    padding: 0;
+  }
+
+  .chat-panel {
+    min-height: 100svh;
+    height: 100svh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .chat-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .chat-header h1 {
+    font-size: 24px;
+  }
+
+  .connection-info,
+  .messages,
+  .composer {
+    padding-inline: 18px;
+  }
+
+  .message {
+    width: 86%;
+  }
+
+  .composer {
+    grid-template-columns: 1fr;
+  }
+}
