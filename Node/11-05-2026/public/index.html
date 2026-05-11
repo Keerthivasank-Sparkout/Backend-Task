@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Rooms Chat</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="login-panel" id="loginPanel">
+        <h1>Realtime Chat</h1>
+        <form id="loginForm">
+          <label for="nameInput">Name</label>
+          <input id="nameInput" type="text" placeholder="Enter your name" required />
+
+          <label for="roomInput">Room</label>
+          <input id="roomInput" type="text" value="general" required />
+
+          <button type="submit">Join Chat</button>
+        </form>
+      </section>
+
+      <section class="chat-panel hidden" id="chatPanel">
+        <aside class="sidebar">
+          <div>
+            <p class="small-title">Current room</p>
+            <h2 id="currentRoom">general</h2>
+          </div>
+
+          <form id="roomForm" class="inline-form">
+            <input id="newRoomInput" type="text" placeholder="Room name" />
+            <button type="submit">Switch</button>
+          </form>
+
+          <div>
+            <p class="small-title">Online users</p>
+            <ul id="userList" class="user-list"></ul>
+          </div>
+        </aside>
+
+        <section class="messages-area">
+          <div id="messages" class="messages"></div>
+
+          <form id="messageForm" class="message-form">
+            <select id="messageType">
+              <option value="room">Room message</option>
+              <option value="private">Private message</option>
+            </select>
+            <select id="privateUserSelect" class="hidden"></select>
+            <input id="messageInput" type="text" placeholder="Type message..." />
+            <button type="submit">Send</button>
+          </form>
+        </section>
+      </section>
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/script.js"></script>
+  </body>
+</html>
