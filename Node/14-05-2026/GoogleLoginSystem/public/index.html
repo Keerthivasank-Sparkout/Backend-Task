@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Login System</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <main id="root"></main>
+
+    <script type="text/babel">
+      const { useEffect, useState } = React;
+
+      const api = {
+        async getConfig() {
+          const response = await fetch('/api/config');
+          return response.json();
+        },
+        async googleLogin(credential) {
+          const response = await fetch('/api/auth/google', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential }),
+          });
+
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || 'Login failed');
+          return data;
+        },
+        async me(token) {
+          const response = await fetch('/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || 'Session expired');
+          return data;
+        },
+      };
+
+      function App() {
+        const [googleClientId, setGoogleClientId] = useState('');
+        const [googleReady, setGoogleReady] = useState(false);
+        const [user, setUser] = useState(null);
+        const [loading, setLoading] = useState(true);
+        const [message, setMessage] = useState('');
+
+        useEffect(() => {
+          const bootstrap = async () => {
+            try {
+              const config = await api.getConfig();
+              setGoogleClientId(config.googleClientId);
+
+              const savedToken = localStorage.getItem('auth_token');
+              if (savedToken) {
+                const data = await api.me(savedToken);
+                setUser(data.user);
+              }
+            } catch (error) {
+              localStorage.removeItem('auth_token');
+              setMessage(error.message);
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          bootstrap();
+        }, []);
+
+        useEffect(() => {
+          const timer = window.setInterval(() => {
+            if (window.google?.accounts?.id) {
+              setGoogleReady(true);
+              window.clearInterval(timer);
+            }
+          }, 150);
+
+          return () => window.clearInterval(timer);
+        }, []);
+
+        useEffect(() => {
+          if (!googleClientId || user || !googleReady) return;
+
+          const googleButton = document.getElementById('googleButton');
+          if (!googleButton) return;
+
+          googleButton.innerHTML = '';
+
+          window.google.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: async ({ credential }) => {
+              setMessage('');
+              setLoading(true);
+
+              try {
+                const data = await api.googleLogin(credential);
+                localStorage.setItem('auth_token', data.token);
+                setUser(data.user);
+              } catch (error) {
+                setMessage(error.message);
+              } finally {
+                setLoading(false);
+              }
+            },
+          });
+
+          window.google.accounts.id.renderButton(googleButton, {
+            theme: 'filled_blue',
+            size: 'large',
+            shape: 'rectangular',
+            width: 320,
+            text: 'continue_with',
+          });
+        }, [googleClientId, googleReady, user]);
+
+        const logout = () => {
+          localStorage.removeItem('auth_token');
+          setUser(null);
+          setMessage('You have been logged out.');
+        };
+
+        return (
+          <section className="shell">
+            <div className="panel auth-panel">
+              <div className="brand-mark">G</div>
+              <p className="eyebrow">Google OAuth</p>
+              <h1>Secure sign in for your app</h1>
+              <p className="subtitle">
+                Sign in with a Google account, verify the credential on Express, then continue
+                with a JWT-backed session.
+              </p>
+
+              {loading && <div className="status">Checking session...</div>}
+
+              {!loading && !user && (
+                <div className="login-area">
+                  {googleClientId && googleReady ? (
+                    <div>
+                      <div id="googleButton" className="google-button"></div>
+                      <p className="helper-text">Use the Google button above to continue.</p>
+                    </div>
+                  ) : googleClientId ? (
+                    <div className="status">Loading Google sign in script...</div>
+                  ) : (
+                    <div className="status warning">
+                      Create a .env file and add GOOGLE_CLIENT_ID to show the login button.
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {!loading && user && (
+                <div className="profile-card">
+                  <img src={user.picture || 'https://www.gravatar.com/avatar/?d=mp'} alt={user.name} />
+                  <div>
+                    <h2>{user.name}</h2>
+                    <p>{user.email}</p>
+                  </div>
+                  <button type="button" onClick={logout}>Logout</button>
+                </div>
+              )}
+
+              {message && <p className="message">{message}</p>}
+            </div>
+          </section>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+  </body>
+</html>
