@@ -21,11 +21,11 @@ jobs:
           node-version: 20
 
       - name: Install backend dependencies
-        working-directory: server
+        working-directory: ./devops/server
         run: npm ci
 
       - name: Lint backend
-        working-directory: server
+        working-directory: ./devops/server
         run: npm run lint -- --max-warnings=0
 
       - name: Install frontend dependencies
