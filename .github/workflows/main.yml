@@ -2,9 +2,10 @@ name: build-and-lint
 
 on:
   push:
-    branches:[main, dev]
+    branches: [main, dev]
+
   pull_request:
-    branches:[main, dev]
+    branches: [main, dev]
 
 jobs:
   build-and-lint:
@@ -12,11 +13,11 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/Checkout@v3
+        uses: actions/checkout@v3
 
       - name: Setup Node
-        uses: actions.setup-node@v3
-        with: 
+        uses: actions/setup-node@v3
+        with:
           node-version: 20
 
       - name: Install backend dependencies
@@ -36,7 +37,7 @@ jobs:
         run: npm run lint -- --max-warnings=0
 
       - name: Build backend image
-        run: docker build -t backend ./devops/server  
+        run: docker build -t backend ./devops/server
 
       - name: Build frontend image
         run: docker build -t frontend ./devops/client
