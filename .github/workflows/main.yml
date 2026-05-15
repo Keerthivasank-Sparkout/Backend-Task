@@ -29,7 +29,7 @@ jobs:
         run: npm run lint -- --max-warnings=0
 
       - name: Install frontend dependencies
-        working-directory: .devops/client
+        working-directory: ./devops/client
         run: npm ci
 
       - name: Lint frontend
