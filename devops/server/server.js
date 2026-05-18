@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin:"http://localhost:5173"
+  origin:["http://localhost:5173","http://16.170.246.235:5173"]
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
