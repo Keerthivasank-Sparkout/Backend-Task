@@ -22,7 +22,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         };
       },
     }),
-    HelloModule, UserModule, PostsModule],
+    HelloModule,PostsModule],
   controllers: [AppController],
   providers: [AppService],
 })
