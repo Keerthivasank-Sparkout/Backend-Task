@@ -1,29 +1,11 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
-import { existsSync, readFileSync } from 'fs';
 import { Model } from 'mongoose';
-import { join } from 'path';
-import {
-  Address,
-  createPublicClient,
-  createWalletClient,
-  getAddress,
-  http,
-  Log,
-  parseEventLogs,
-} from 'viem';
+import { Address, createPublicClient, createWalletClient, getAddress, http, Log, parseEventLogs } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { myContactAbi } from './abi/my-contact.abi';
-import {
-  ContractEvent,
-  ContractEventDocument,
-} from './schemas/contract-event.schema';
+import { ContractEvent, ContractEventDocument } from './schemas/contract-event.schema';
 
 type ContractEventName = 'NAME_CHANGED' | 'USER_DETAILS_CHANGED';
 
@@ -35,23 +17,18 @@ export class ContractService implements OnModuleInit, OnModuleDestroy {
   private readonly publicClient;
   private readonly walletClient;
   private readonly unwatchers: Array<() => void> = [];
-  private readonly fileEnv = this.loadFileEnv();
-
-  constructor(
-    private readonly configService: ConfigService,
+  constructor(private readonly configService: ConfigService,
     @InjectModel(ContractEvent.name)
-    private readonly contractEventModel: Model<ContractEventDocument>,
-  ) {
-    const rpcUrl = this.getEnv('RPC_URL', 'HOODI_RPC_URL', 'SEPOLIA_RPC_URL');
-    const privateKey = this.getEnv(
-      'PRIVATE_KEY',
-      'HOODI_PRIVATE_KEY',
-      'SEPOLIA_PRIVATE_KEY',
-    );
+    private readonly contractEventModel: Model<ContractEventDocument>,) {
+
+    const rpcUrl = this.configService.getOrThrow<string>('HOODI_RPC_URL');
+
+    const privateKey = this.configService.getOrThrow<string>('PRIVATE_KEY');
 
     this.contractAddress = getAddress(
-      this.getEnv('CONTRACT_ADDRESS', 'MYCONTACT_ADDRESS'),
+      this.configService.getOrThrow<string>('CONTRACT_ADDRESS')
     );
+
     this.account = privateKeyToAccount(privateKey as `0x${string}`);
 
     const transport = http(rpcUrl);
@@ -61,7 +38,6 @@ export class ContractService implements OnModuleInit, OnModuleDestroy {
       transport,
     });
   }
-
   onModuleInit() {
     this.startEventWatcher();
   }
@@ -136,6 +112,12 @@ export class ContractService implements OnModuleInit, OnModuleDestroy {
     return this.contractEventModel.find().sort({ createdAt: -1 }).lean();
   }
 
+  async getEventsByType(eventName: string) {
+  return this.contractEventModel.find({
+    eventName,
+  });
+}
+
   private startEventWatcher() {
     this.watchEvent('NAME_CHANGED');
     this.watchEvent('USER_DETAILS_CHANGED');
@@ -173,21 +155,32 @@ export class ContractService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private async saveContractEvent(eventName: ContractEventName, log: any) {
-    const eventData = this.makeEventData(eventName, log);
+  private async saveContractEvent(
+    eventName: ContractEventName,
+    log: any,
+  ) {
+    try {
+      const eventData = this.makeEventData(eventName, log);
 
-    if (!eventData.transactionHash || eventData.logIndex === undefined) {
-      return;
+      if (
+        !eventData.transactionHash ||
+        eventData.logIndex === undefined
+      ) {
+        this.logger.warn('Invalid event received');
+        return;
+      }
+
+      await this.contractEventModel.updateOne(
+        {
+          transactionHash: eventData.transactionHash,
+          logIndex: eventData.logIndex,
+        },
+        { $setOnInsert: eventData },
+        { upsert: true },
+      );
+    } catch (error) {
+      this.logger.error('Failed to save event', error);
     }
-
-    await this.contractEventModel.updateOne(
-      {
-        transactionHash: eventData.transactionHash,
-        logIndex: eventData.logIndex,
-      },
-      { $setOnInsert: eventData },
-      { upsert: true },
-    );
   }
 
   private makeEventData(eventName: ContractEventName, log: any) {
@@ -210,47 +203,5 @@ export class ContractService implements OnModuleInit, OnModuleDestroy {
   private getStartBlock() {
     const block = this.configService.get<string>('EVENT_START_BLOCK');
     return block ? BigInt(block) : undefined;
-  }
-
-  private getEnv(...keys: string[]) {
-    for (const key of keys) {
-      const value = this.fileEnv[key] ?? this.configService.get<string>(key);
-      if (value) {
-        return value;
-      }
-    }
-
-    throw new Error(`${keys.join(' or ')} is required`);
-  }
-
-  private loadFileEnv() {
-    const env: Record<string, string> = {};
-    const envFiles = ['.env.example', '.env'];
-
-    for (const fileName of envFiles) {
-      const filePath = join(process.cwd(), fileName);
-      if (!existsSync(filePath)) {
-        continue;
-      }
-
-      const lines = readFileSync(filePath, 'utf8').split('\n');
-      for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (!trimmedLine || trimmedLine.startsWith('#')) {
-          continue;
-        }
-
-        const separatorIndex = trimmedLine.indexOf('=');
-        if (separatorIndex === -1) {
-          continue;
-        }
-
-        const key = trimmedLine.slice(0, separatorIndex).trim();
-        const value = trimmedLine.slice(separatorIndex + 1).trim();
-        env[key] = value.replace(/^['"]|['"]$/g, '');
-      }
-    }
-
-    return env;
   }
 }

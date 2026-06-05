@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ContractService } from './contract.service';
 import { SetNameDto } from './dto/set-name.dto';
 import { SetUserDetailsDto } from './dto/set-user-details.dto';
@@ -38,5 +38,12 @@ export class ContractController {
   @Get('events')
   getEvents() {
     return this.contractService.getEvents();
+  }
+
+   @Get(':eventName')
+  getEventsByType( @Param('eventName') eventName: string) {
+    return this.contractService.getEventsByType(
+      eventName,
+    );
   }
 }
