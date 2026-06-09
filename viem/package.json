@@ -1,0 +1,24 @@
+{
+  "name": "viem",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.7",
+    "@types/node": "^25.9.2",
+    "dotenv": "^17.4.2",
+    "hardhat": "^3.8.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3",
+    "viem": "^2.52.2"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-verify": "^3.0.19"
+  }
+}
